@@ -9,6 +9,7 @@
 #include "game.hpp"
 #include "characters.hpp"
 #include "Observer.hpp"
+#include "functions.hpp"
 
 const int mapSize = 7;
 
@@ -18,10 +19,12 @@ float x_cellSize =screenWidth / mapSize;
 
 float y_cellSize=screenHeight / mapSize;
 
-Vector2 player_position={5, 5};
+Vector2 player_position = {2, 4};
+
+Vector2 monster_position = {2, 2};
 
 
-int x = 5, y = 5;
+int x = 2, y = 4, a = 2, b = 2;
 
 //                     0 ,1 ,2 ,3 ,4 ,5 ,6
 int board[7][7]={/*0*/{0 ,0 ,0 ,0 ,0 ,0 ,0},
@@ -32,17 +35,6 @@ int board[7][7]={/*0*/{0 ,0 ,0 ,0 ,0 ,0 ,0},
                  /*5*/{0 ,0 ,0 ,0 ,0 ,0 ,0},
                  /*6*/{0 ,0 ,0 ,0 ,0 ,0 ,0}
                 };
-
-// void randomize_board(){
-//     int k = mapSize * 2 + 1;
-//     while(k){
-//     for(int i = 0; i < mapSize; i++)
-//         for(int j = 0; j < mapSize; j++){
-            
-//     }
-
-// }
-// }
 
 struct Cell{
 
@@ -96,42 +88,87 @@ struct Cell{
         }
         has_texture = true;
     }
+    
 };
 
 
-void movement() {
-    if(turn){
+void movement_hiro() {
+    if(turn > 0){
         if(y > 1)
             if(board[y-2][x-1] == 0)
                 if (IsKeyPressed(KEY_W)){
                     y -= 1;
+                    turn--;
                 }
         if(y < mapSize)
             if(board[y][x-1] == 0)
                 if(IsKeyPressed(KEY_S)) {
                     y += 1;
-            }
+                    turn--;
+                }
     }
-    if(turn){
+    if(turn > 0){
         if(x < mapSize)
             if(board[y-1][x] == 0)
                 if(IsKeyPressed(KEY_D)){
-                x += 1;
-            }
+                    x += 1;
+                    turn--;
+                }
         if(x > 1)
             if(board[y-1][x-2] == 0)
                 if (IsKeyPressed(KEY_A)) {
                 x -= 1;
+                turn--;
             }
     }
 }
+// a = x; b = y
+void movement_monster(){
+    if(turn <= 0){
+        if(b < mapSize && board[b][a-1] == 0)
+            if(b + 1 < y){
+                b +=  1;
+                turn++;
+            }
+    }
+    if(turn <= 0){
+        if(a < mapSize && board[b-1][a] == 0)
+            if(a < x){
+                a +=  1;
+                turn++;
+            }
+    }
+    if(turn <= 0){
+        if(b > 1 && board[b-2][a-1] == 0)
+            if(b > y + 1){
+                b -=  1;
+                turn++;
+            }
+    }
+    if(turn <= 0){
+        if(a > 1 && board[b-1][a-2] == 0)
+            if(a > x){
+                a -=  1;
+                turn++;
+            }
+        }
+    }
 
 std::map<std::pair<int,int>, Cell> cell_Instance;
+
+void randomize_board(int seed,int n,Texture2D stone_1, Texture2D stone_2, Texture2D bush_1, Texture2D bush_2, Texture2D bush_3){
+    srand(1);
+    if(n>0){
+        cell_Instance[{rand()%7+0,rand()%7+0}].give_texture(stone_1, stone_2, bush_1, bush_2, bush_3);
+        cell_Instance[{rand()%7+0,rand()%7+0}].free=false;
+        n--;
+    }
+}
 
 void InitiateBoard(Texture2D grass, Texture2D stone_1, Texture2D stone_2, Texture2D bush_1, Texture2D bush_2, Texture2D bush_3) {
     Rectangle image{0, 0, 2000, 2000};
     DrawTexturePro(grass,image,Rectangle{0,0,screenWidth,screenHeight},Vector2{0,0},0.0f,WHITE);
-    seed=1000;
+    seed = 1000;
     for (int i = 0; i < mapSize; i++) {
         for (int j = 0; j < mapSize; j++) {
             Color cellColor = RED;
@@ -150,6 +187,10 @@ void InitiateBoard(Texture2D grass, Texture2D stone_1, Texture2D stone_2, Textur
                 cell_Instance[{i,j}].free = false;
                 cell_Instance[{i,j}].character = true;
             }
+            if(a == j + 1 && b == i + 1){
+                cell_Instance[{i,j}].free = false;
+                cell_Instance[{i,j}].character = true;
+            }
 
             
             if(cell_Instance[{i,j}].free == false && cell_Instance[{i,j}].has_texture == false && cell_Instance[{i,j}].character == false){
@@ -160,13 +201,13 @@ void InitiateBoard(Texture2D grass, Texture2D stone_1, Texture2D stone_2, Textur
     
     
     }
-    movement();
+    
 }
 
 void ModifyBoard(){
     for (int i = 0; i < mapSize; i++) {
         for (int j = 0; j < mapSize; j++) {
-
+            if(turn)
             if(cell_Instance[{i,j}].free){
                 cell_Instance[{i,j}].show_position();
             }
@@ -174,4 +215,6 @@ void ModifyBoard(){
 
         }
     }
+    movement_hiro();
+    movement_monster();
 }
