@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 #include <thread>
+#include <iostream>
 
 #include "characters.hpp"
 #include "map.hpp"
@@ -14,6 +15,7 @@
 Observer events;
 
 int turn = 1;
+bool isAlive = true;
 
 struct Potion
 {
@@ -59,7 +61,8 @@ struct Hero :Character {
     Color team;
     
     Hero(int a, int b, Color color){
-        hp = 10;
+        hp = 20;  
+        dmg = 1;
         pos_x = a;
         pos_y = b;
         team = color;
@@ -99,15 +102,17 @@ struct Hero :Character {
 
 };
 
-
 struct Monster :Character {
     Color team;
+    bool isAlive;
 
     Monster(int a, int b, Color color){
-        dmg = GetRandomValue(1, 5);
+        hp = 3;
+        dmg = 2;
         pos_x = a;
         pos_y = b;
         team = color;
+        isAlive = true;
     }
 
     void Update_Texture(){
@@ -127,9 +132,9 @@ struct Monster :Character {
     }
 
     void create(float x_cellSize, float y_cellSize, Texture2D hiro){
-        currentPosition(x_cellSize, y_cellSize, team);
-        DrawTexture(x_cellSize, y_cellSize, hiro);
-        Update_Texture();
+            currentPosition(x_cellSize, y_cellSize, team);
+            DrawTexture(x_cellSize, y_cellSize, hiro);
+            Update_Texture();
     }
     //texture//
 
@@ -140,20 +145,82 @@ struct Monster :Character {
     /////////
 
 };
+
 Potion Health(2, 2);
 Hero Hiro(player_position.x, player_position.y, GREEN);
-Monster Enemy(monster_position.x, monster_position.y, RED);
+Monster* Enemy = new Monster(monster_position.x, monster_position.y, RED);
 
 // a = x; b = y
-void Update_Health(){
-    if(!turn)
-        if(b + 1 == y && a == x || b - 1 == y && a == x){
-            Hiro.hp -= Enemy.dmg;
+void movement_monster(){
+    if(turn <= 0){
+        if(b < mapSize && board[b][a-1] == 0)
+            if(b + 1 < y){
+                b +=  1;
+                turn++;
+            }
+    }
+    if(turn <= 0){
+        if(a < mapSize && board[b-1][a] == 0)
+            if(a + 1 < x){
+                a +=  1;
+                turn++;
+            }
+    }
+    if(turn <= 0){
+        if(b > 1 && board[b-2][a-1] == 0)
+            if(b > y + 1){
+                b -=  1;
+                turn++;
+            }
+    }
+    if(turn <= 0){
+        if(a > 1 && board[b-1][a-2] == 0)
+            if(a > x + 1){
+                a -=  1;
+                turn++;
+            }
+    }
+}
+void movement_hiro() {
+    if(turn > 0){
+        if(y > 1)
+            if(board[y-2][x-1] == 0)
+                if (IsKeyPressed(KEY_W)){
+                    y -= 1;
+                    turn--;
+                }
+        if(y < mapSize)
+            if(board[y][x-1] == 0)
+                if(IsKeyPressed(KEY_S)) {
+                    y += 1;
+                    turn--;
+                }
+}
+    if(turn > 0){
+        if(x < mapSize)
+            if(board[y-1][x] == 0)
+                if(IsKeyPressed(KEY_D)){
+                    x += 1;
+                    turn--;
+                }
+    if(x > 1)
+        if(board[y-1][x-2] == 0)
+            if (IsKeyPressed(KEY_A)) {
+                x -= 1;
+                turn--;
+            }
+    }
+    if(!isAlive){
+        turn = 2147483647;
+    }
+}
+void Up_Health_Hiro(){
+    if(turn <= 0 && isAlive)
+        if((b + 1 == y && a == x) || (b - 1 == y && a == x) || (b == y && a + 1 == x) || (b == y && a - 1 == x)){
+            Hiro.hp -= Enemy->dmg;
             turn = 2;
         }
-    if(Health.count == 0)
-        Health.hp_points = 0;
-    if(IsKeyPressed(KEY_Q)){
+    if(IsKeyPressed(KEY_Q) && Health.count != 0){
         Hiro.hp += Health.hp_points;
         Health.count -= 1;
     }
@@ -165,9 +232,32 @@ void Update_Health(){
     }
     DrawText(TextFormat("Health: %d", Hiro.hp), 10, 10, 35, WHITE);
     }
+void Up_Health_Enemy(){
+   if(turn > 0){
+       if ((y + 1 == b && x == a) || (y - 1 == b && x == a) || ((y == b && x + 1 == a) || (y == b && x - 1 == a))) 
+            if(IsKeyPressed(KEY_F)){
+                Enemy->hp -= Hiro.dmg;
+                turn = 0;
+            }
+   }
+    if(Enemy->hp <= 0){
+        Enemy->hp = 0;
+        isAlive = false;
+        }
+    DrawText(TextFormat("Health: %d", Enemy->hp), 10, 40, 35, WHITE);
+}
 
 void Char(int x_cellSize, int y_cellSize, Texture2D hiro){
     Hiro.create(x_cellSize, y_cellSize, hiro);
-    Enemy.create(x_cellSize, y_cellSize, hiro);
-    Update_Health();
+    movement_hiro();
+    Up_Health_Hiro();
+    
+    if (isAlive){
+        Enemy->create(x_cellSize, y_cellSize, hiro);
+        movement_monster();
+        Up_Health_Enemy();
+    }
+    else{
+        board[b][a] = 0;
+}
 }

@@ -5,7 +5,7 @@ Game made using Raylib and C++
 
 • Clone repository using:
 ```bash
-git clone https://github.com/MnT-s-Entertainment/turn-base-game.git
+git clone https://github.com/Stefix4/Turn-base-Game.git
 ```
 • Compile using:
 ```bash
