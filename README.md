@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Turn-base-Game
 Game made using Raylib and C++
 
@@ -84,3 +85,21 @@ Contributions are welcome! If you want to contribute:
 - Run `make` and `make run` locally to verify changes and include build notes in the PR description if the change requires extra steps.
 
 ![image](https://github.com/Stefix4/Turn-base-Game/assets/94927709/df2e3525-7f3c-45f3-bdca-a3c2333ead51)
+=======
+# Turn-base-Game
+Game made using Raylib and C++
+
+#### **How to compile & run:**
+
+• Clone repository using:
+```bash
+git clone https://github.com/Stefix4/Turn-base-Game.git
+```
+• Compile using:
+```bash
+make
+```
+• And run the Game file
+
+![image](https://github.com/Stefix4/Turn-base-Game/assets/94927709/df2e3525-7f3c-45f3-bdca-a3c2333ead51)
+>>>>>>> 5ab3ec13addabef1b7f4a7d08eb02b2832e01ec6
