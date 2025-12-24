@@ -1,23 +1,33 @@
 #include <raylib.h>
+#include <future>
+#include <chrono>
+#include <thread>
+
 
 #include "map.hpp"
 #include "characters.hpp"
 #include "game.hpp"
 #include "functions.hpp"
+#include "menu.hpp"
 
 float screenWidth = 1280;
 float screenHeight = 780;
+const int level = 1;
+
+MenuState currentMenuState = MenuState::MENU;
 
 int main(void)
-{
+{   
+    
 
     //initialling the window
     InitWindow(screenWidth,screenHeight, "Turn-base-Game");
-    SetTargetFPS(144);
+    SetTargetFPS(30);
     //SetWindowMinSize(screenWidth,screenHeight);
     
     //declaring images/textures
     Texture2D hiro = LoadTexture("./resources/hiro.png");
+    Texture2D background = LoadTexture("./resources/background2.png");
     Texture2D grass = LoadTexture("./resources/grass.png");
     Texture2D stone_1=LoadTexture("./resources/stone_v1.png");
     Texture2D stone_2=LoadTexture("./resources/stone_v3.png");
@@ -32,15 +42,21 @@ int main(void)
 
         BeginDrawing();
         toggleFullscreen();
-        InitiateBoard(grass, stone_1, stone_2, bush_1, bush_2, bush_3);
-        ModifyBoard();
-        Char(x_cellSize,y_cellSize,hiro);
-        wait(2.0f);
+        menus(hiro,background, grass, stone_1, stone_2, bush_1, bush_2, bush_3);
         ClearBackground(WHITE);
+
+        if (menuStateSelected == 1)
+            currentMenuState = MenuState::PLAY;
+        if (menuStateSelected == 2)
+            currentMenuState = MenuState::GAME_OVER;
+        if (menuStateSelected == 3)
+            currentMenuState = MenuState::EXIT;
+
         EndDrawing();
     }
 
     UnloadTexture(hiro);
+    UnloadTexture(background);
     UnloadTexture(grass);
     UnloadTexture(stone_1);
     UnloadTexture(stone_2);

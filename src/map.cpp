@@ -9,6 +9,7 @@
 #include "game.hpp"
 #include "characters.hpp"
 #include "Observer.hpp"
+#include "functions.hpp"
 
 const int mapSize = 7;
 
@@ -16,33 +17,24 @@ int seed = 1000;
 
 float x_cellSize =screenWidth / mapSize;
 
-float y_cellSize=screenHeight / mapSize;
+float y_cellSize = screenHeight / mapSize;
 
-Vector2 player_position={5, 5};
+Vector2 player_position = {2, 4};
+
+Vector2 monster_position = {2, 2};
 
 
-int x = 5, y = 5;
+int x = 2, y = 4, a = 2, b = 2;
 
 //                     0 ,1 ,2 ,3 ,4 ,5 ,6
 int board[7][7]={/*0*/{0 ,0 ,0 ,0 ,0 ,0 ,0},
                  /*1*/{0 ,0 ,0 ,0 ,0 ,0 ,0},
-                 /*2*/{0 ,0 ,0 ,0 ,0 ,0 ,0},
+                 /*2*/{0 ,0 ,1 ,0 ,0 ,0 ,0},
                  /*3*/{0 ,0 ,0 ,0 ,0 ,0 ,0},
                  /*4*/{0 ,0 ,0 ,0 ,0 ,0 ,0},
                  /*5*/{0 ,0 ,0 ,0 ,0 ,0 ,0},
                  /*6*/{0 ,0 ,0 ,0 ,0 ,0 ,0}
                 };
-
-// void randomize_board(){
-//     int k = mapSize * 2 + 1;
-//     while(k){
-//     for(int i = 0; i < mapSize; i++)
-//         for(int j = 0; j < mapSize; j++){
-            
-//     }
-
-// }
-// }
 
 struct Cell{
 
@@ -96,42 +88,24 @@ struct Cell{
         }
         has_texture = true;
     }
+    
 };
 
+std::map<std::pair<int,int>, Cell> cell_Instance;
 
-void movement() {
-    if(turn){
-        if(y > 1)
-            if(board[y-2][x-1] == 0)
-                if (IsKeyPressed(KEY_W)){
-                    y -= 1;
-                }
-        if(y < mapSize)
-            if(board[y][x-1] == 0)
-                if(IsKeyPressed(KEY_S)) {
-                    y += 1;
-            }
-    }
-    if(turn){
-        if(x < mapSize)
-            if(board[y-1][x] == 0)
-                if(IsKeyPressed(KEY_D)){
-                x += 1;
-            }
-        if(x > 1)
-            if(board[y-1][x-2] == 0)
-                if (IsKeyPressed(KEY_A)) {
-                x -= 1;
-            }
+void randomize_board(int seed,int n,Texture2D stone_1, Texture2D stone_2, Texture2D bush_1, Texture2D bush_2, Texture2D bush_3){
+    srand(1);
+    if(n>0){
+        cell_Instance[{rand()%7+0,rand()%7+0}].give_texture(stone_1, stone_2, bush_1, bush_2, bush_3);
+        cell_Instance[{rand()%7+0,rand()%7+0}].free=false;
+        n--;
     }
 }
-
-std::map<std::pair<int,int>, Cell> cell_Instance;
 
 void InitiateBoard(Texture2D grass, Texture2D stone_1, Texture2D stone_2, Texture2D bush_1, Texture2D bush_2, Texture2D bush_3) {
     Rectangle image{0, 0, 2000, 2000};
     DrawTexturePro(grass,image,Rectangle{0,0,screenWidth,screenHeight},Vector2{0,0},0.0f,WHITE);
-    seed=1000;
+    seed = 1000;
     for (int i = 0; i < mapSize; i++) {
         for (int j = 0; j < mapSize; j++) {
             Color cellColor = RED;
@@ -143,14 +117,19 @@ void InitiateBoard(Texture2D grass, Texture2D stone_1, Texture2D stone_2, Textur
             if(board[i][j] == 1){
                 cell_Instance[{i,j}].free=false;
             }
-            else if(board[i][j] == 0)
+            else if(board[i][j] == 0){
                 cell_Instance[{i,j}].free=true;
+                cell_Instance[{i,j}].character = false;
+            }
             
             if(x == j + 1 && y == i + 1){
                 cell_Instance[{i,j}].free = false;
                 cell_Instance[{i,j}].character = true;
             }
-
+            if((a == j + 1 && b == i + 1) && isAlive){
+                cell_Instance[{i,j}].free = false;
+                cell_Instance[{i,j}].character = true;
+            }
             
             if(cell_Instance[{i,j}].free == false && cell_Instance[{i,j}].has_texture == false && cell_Instance[{i,j}].character == false){
                 cell_Instance[{i,j}].give_texture(stone_1, stone_2, bush_1, bush_2, bush_3);
@@ -158,19 +137,40 @@ void InitiateBoard(Texture2D grass, Texture2D stone_1, Texture2D stone_2, Textur
             seed++;
         }
     
-    
     }
-    movement();
+    
 }
+
 
 void ModifyBoard(){
     for (int i = 0; i < mapSize; i++) {
         for (int j = 0; j < mapSize; j++) {
-
-            if(cell_Instance[{i,j}].free){
-                cell_Instance[{i,j}].show_position();
+            if(turn)
+                if(cell_Instance[{i,j}].free){
+                    cell_Instance[{i,j}].show_position();
+                }
+        }
+    }
+}
+void Updateboard(){
+    for (int i = 0; i < mapSize; i++) {
+        for (int j = 0; j < mapSize; j++) {
+            if(board[i][j] == 1){
+                cell_Instance[{i,j}].free=false;
             }
-
+            else if(board[i][j] == 0){
+                cell_Instance[{i,j}].free=true;
+                cell_Instance[{i,j}].character = false;
+            }
+            
+            if(x == j + 1 && y == i + 1){
+                cell_Instance[{i,j}].free = false;
+                cell_Instance[{i,j}].character = true;
+            }
+            if(a == j + 1 && b == i + 1){
+                cell_Instance[{i,j}].free = false;
+                cell_Instance[{i,j}].character = true;
+            }
 
         }
     }
