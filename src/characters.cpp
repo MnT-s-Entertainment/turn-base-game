@@ -171,11 +171,7 @@ void movement_monster(){
             if(b > y + 1){
                 b -=  1;
                 turn++;
-<<<<<<< HEAD
         }
-=======
-            }
->>>>>>> 5ab3ec13addabef1b7f4a7d08eb02b2832e01ec6
     }
     if(turn <= 0){
         if(a > 1 && board[b-1][a-2] == 0)
@@ -184,7 +180,6 @@ void movement_monster(){
                 turn++;
             }
     }
-<<<<<<< HEAD
     if(turn <= 0){
         if(((board[b-1][a] == 1 && b < y ) || (board[b-1][a-2] == 1 && b < y)) && board[b][a-1] == 0){
             b +=  1;
@@ -209,8 +204,6 @@ void movement_monster(){
             turn ++;
     }
     }
-=======
->>>>>>> 5ab3ec13addabef1b7f4a7d08eb02b2832e01ec6
 }
 void movement_hiro() {
     if(turn > 0){
@@ -242,22 +235,14 @@ void movement_hiro() {
             }
     }
     if(!isAlive){
-<<<<<<< HEAD
         turn--;
-=======
-        turn = 2147483647;
->>>>>>> 5ab3ec13addabef1b7f4a7d08eb02b2832e01ec6
     }
 }
 void Up_Health_Hiro(){
     if(turn <= 0 && isAlive)
         if((b + 1 == y && a == x) || (b - 1 == y && a == x) || (b == y && a + 1 == x) || (b == y && a - 1 == x)){
             Hiro.hp -= Enemy->dmg;
-<<<<<<< HEAD
             turn += 2;
-=======
-            turn = 2;
->>>>>>> 5ab3ec13addabef1b7f4a7d08eb02b2832e01ec6
         }
     if(IsKeyPressed(KEY_Q) && Health.count != 0){
         Hiro.hp += Health.hp_points;
@@ -276,11 +261,7 @@ void Up_Health_Enemy(){
        if ((y + 1 == b && x == a) || (y - 1 == b && x == a) || ((y == b && x + 1 == a) || (y == b && x - 1 == a))) 
             if(IsKeyPressed(KEY_F)){
                 Enemy->hp -= Hiro.dmg;
-<<<<<<< HEAD
                 turn--;
-=======
-                turn = 0;
->>>>>>> 5ab3ec13addabef1b7f4a7d08eb02b2832e01ec6
             }
    }
     if(Enemy->hp <= 0){
@@ -302,9 +283,6 @@ void Char(int x_cellSize, int y_cellSize, Texture2D hiro){
     }
     else{
         board[b][a] = 0;
-<<<<<<< HEAD
         turn = 1;
-=======
->>>>>>> 5ab3ec13addabef1b7f4a7d08eb02b2832e01ec6
 }
 }

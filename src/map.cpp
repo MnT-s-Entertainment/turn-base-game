@@ -130,13 +130,6 @@ void InitiateBoard(Texture2D grass, Texture2D stone_1, Texture2D stone_2, Textur
                 cell_Instance[{i,j}].free = false;
                 cell_Instance[{i,j}].character = true;
             }
-<<<<<<< HEAD
-=======
-            else{
-                cell_Instance[{i,j}].free = true;
-                cell_Instance[{i,j}].character = false;
-            }
->>>>>>> 5ab3ec13addabef1b7f4a7d08eb02b2832e01ec6
             
             if(cell_Instance[{i,j}].free == false && cell_Instance[{i,j}].has_texture == false && cell_Instance[{i,j}].character == false){
                 cell_Instance[{i,j}].give_texture(stone_1, stone_2, bush_1, bush_2, bush_3);
